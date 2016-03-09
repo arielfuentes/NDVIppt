@@ -1,0 +1,23 @@
+## required package
+library(raster)
+#list.files
+#I creating list of band 1 and list of band 2.
+
+Band1list  <- list.files(path = ".", pattern = "*.b01.tif", all.files = FALSE,
+                         full.names = FALSE, recursive = FALSE,
+                         ignore.case = FALSE)  
+
+Band2list  <- list.files(path = ".", pattern = "*.b02.tif", all.files = FALSE,
+                         full.names = FALSE, recursive = FALSE,
+                         ignore.case = FALSE)
+
+#Stacking all 46 band 1 (band 2) images to 'StackBand1' ('StackBand2')
+
+StackBand1 <- stack(Band1list)
+
+StackBand2 <- stack(Band2list)
+
+## calculate ndvi from red (band 1) and near-infrared (band 2) channel
+ndvi <- overlay(StackBand1, StackBand2, fun = function(x, y) {
+  (y-x) / (y+x)
+})
