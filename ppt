@@ -1,0 +1,46 @@
+#################################################
+#libraries
+library(rgdal)
+#library(rgeos)
+#library(sp)
+library(ggplot2)
+library(dplyr)
+#library(lubridate)
+#################################################
+#read_shape
+est.shp <- readOGR(dsn = "shp/latlon/estaciones.shp", layer = "estaciones")
+cuenca <- readOGR(dsn = "shp/latlon/subcuenca.shp", layer = "subcuenca")
+#################################################
+#read files, arrangedata
+ppt <- read.csv("ppt2.csv", header = T, sep = ",")
+p_names <-  c("fecha", "cal", "rab", "bat", "hand", "hemb", "chil", "alv", "val", "run", "quil", 
+              "arom", "lliu")
+names(ppt) <- p_names
+ppt$fecha <- as.Date(ppt$fecha, "%d-%m-%Y")
+#################################################
+#monthly
+ppt2monthly <- function(ppt.file, fecha){
+  library(dplyr)
+  library(zoo)
+  ppt.file$mes <- strftime(ppt.file$fecha, "%m")
+  ppt.file$año <- strftime(ppt.file$fecha, "%Y")
+  ppt.file$mensual <- paste(as.character.Date(ppt.file$año),as.character.Date(ppt.file$mes),
+                            sep = "-")
+  drop.col <- c("año", "mes", "fecha")
+  ppt.file <- ppt.file[,!(names(ppt.file) %in% drop.col)]
+  ppt.group <- group_by(.data = ppt.file, mensual)
+  ppt.sum <- summarise_each_(tbl = ppt.group, funs(sum), vars = names(ppt.group))
+  ppt.sum$mensual.ts <- as.yearmon(ppt.mes$mensual, format = "%Y-%m")
+  ppt.sum
+}
+ppt.mes <- ppt2monthly(ppt,fecha)
+summary(object = ppt)
+plot.ts(ppt.mes$cal)
+##############################################################
+library(ggfortify)
+autoplot(ts(ppt))
+var_list = names(ppt)[2:length(ppt)]
+plot_list = list()
+for(i in var_list){
+  
+}
