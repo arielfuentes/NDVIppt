@@ -1,0 +1,26 @@
+#untar
+untar(tarfile = "LT52330832010350CUB00.tar.gz")
+###############################################################################
+#working with rasters
+###############################################################################
+library(raster)
+  #read bands
+  #############################################################################
+  Band1list  <- list.files(path = ".", pattern = "*.B1.TIF", all.files = FALSE,
+                           full.names = FALSE, recursive = FALSE,
+                           ignore.case = FALSE)  
+  Band2list  <- list.files(path = ".", pattern = "*.B2.TIF", all.files = FALSE,
+                           full.names = FALSE, recursive = FALSE,
+                           ignore.case = FALSE)
+  #############################################################################
+  #StackBands
+  StackBand1 <- stack(Band1list)
+  StackBand2 <- stack(Band2list)
+  #############################################################################
+  # ndvi
+  #############################################################################
+  ndvi <- overlay(StackBand1, StackBand2, fun = function(x, y) {
+    (y-x) / (y+x)
+  })
+  #############################################################################
+###############################################################################
